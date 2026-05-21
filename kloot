@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+if [ "$PWD" = "$HOME" ]; then
+  echo "Do not run this command in your homedir to prevent leaking credentials!"
+  exit 1
+fi
+
+docker run --rm \
+  --cap-drop=ALL \
+  --security-opt=no-new-privileges \
+  --user "$(id -u):$(id -g)" \
+  -e HOME=/home/claude-docked \
+  -v "$PWD:$PWD" \
+  -w "$PWD" \
+  -v "$HOME/.kloot:/home/claude-docked/.claude" \
+  -v "$HOME/.task:/home/claude-docked/.task" \
+  -v "$HOME/.kloot/.claude.json:/home/claude-docked/.claude.json" \
+  -it kloot:latest claude --allow-dangerously-skip-permissions "$@"

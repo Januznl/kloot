@@ -1,0 +1,27 @@
+version: "3"
+tasks:
+  default:
+    cmds:
+      - task --list
+    silent: true
+
+  build:
+    desc: "build container"
+    silent: true
+    cmds:
+      - docker build -t kloot:latest .
+
+  sh:
+    desc: "build container"
+    silent: true
+    cmds:
+      - docker run --rm -it kloot:latest bash
+
+  install:
+    desc: "install kloot command"
+    silent: true
+    cmds:
+      - touch ~/.kloot/.claude.json
+      - echo "Creating symlink to /usr/local/bin/kloot (needs sudo permissions)"
+      - sudo ln -s "$(pwd)/kloot" /usr/local/bin/kloot
+
