@@ -1,5 +1,5 @@
 # Kloot
-Running Claude in a docker container locally on your system.
+Running Claude in a docker container locally on your system, based on https://github.com/trekhleb/claude-pod/tree/main 
 
 ## Included packages
 * RTK (https://github.com/rtk-ai/rtk)
