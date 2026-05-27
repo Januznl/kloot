@@ -13,6 +13,7 @@ docker run --rm \
   -v "$PWD:$PWD" \
   -w "$PWD" \
   -v "$HOME/.kloot:/home/claude-docked/.claude" \
+  -v "$HOME/kloot:/home/claude-docked/kloot" \
   -v "$HOME/.task:/home/claude-docked/.task" \
   -v "$HOME/.kloot/.claude.json:/home/claude-docked/.claude.json" \
   -it kloot:latest claude --allow-dangerously-skip-permissions "$@"
