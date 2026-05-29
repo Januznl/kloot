@@ -16,4 +16,4 @@ docker run --rm \
   -v "$HOME/kloot:/home/claude-docked/kloot" \
   -v "$HOME/.task:/home/claude-docked/.task" \
   -v "$HOME/.kloot/.claude.json:/home/claude-docked/.claude.json" \
-  -it kloot:latest claude --allow-dangerously-skip-permissions "$@"
+  -it kloot:latest claude --dangerously-skip-permissions "$@"

@@ -1,8 +1,13 @@
 FROM node:24-trixie-slim
 
+# Disable the interactive download prompt globally in the container
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git ca-certificates curl less jq gh \
+ && apt-get install -y --no-install-recommends git ca-certificates curl less jq gh golang \
  && rm -rf /var/lib/apt/lists/*
+
+RUN npm install -g corepack
 
 ARG CLAUDE_CODE_VERSION=latest
 RUN npm install -g @anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}
