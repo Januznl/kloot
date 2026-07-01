@@ -9,7 +9,7 @@ tasks:
     desc: "build container"
     silent: true
     cmds:
-      - docker build -t kloot:latest .
+      - docker build -t kloot:latest . --no-cache
 
   sh:
     desc: "build container"
