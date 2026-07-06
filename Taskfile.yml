@@ -10,6 +10,7 @@ tasks:
     silent: true
     cmds:
       - docker build -t kloot:latest . --no-cache
+      - docker run -it kloot:latest claude --version
 
   sh:
     desc: "build container"
