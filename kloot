@@ -8,10 +8,15 @@ fi
 # Claude Code sessions discover each other through ~/.claude/sessions/<pid>.json
 # and talk over unix sockets in /tmp/cc-socks/<pid>.sock. A peer only counts as
 # reachable when it lives in the same PID namespace, so every kloot container
-# joins the namespace of one long-lived anchor container and shares one /tmp
+# joins the namespace of one shared anchor container and shares one /tmp
 # through a named volume. A named volume is used instead of a bind mount because
 # unix sockets on a macOS bind mount are unreliable under Docker Desktop.
+# The anchor exists only while at least one session is running: it is created here
+# on demand and removed by the last session to exit (see the cleanup at the end).
 anchor_container=kloot-pidns
+# Every session container carries this label so the cleanup can tell whether any
+# other session is still attached to the anchor's PID namespace.
+session_label=kloot.role=session
 if [ "$(docker inspect -f '{{.State.Running}}' "$anchor_container" 2>/dev/null)" != "true" ]; then
   docker rm -f "$anchor_container" >/dev/null 2>&1
   docker run -d --name "$anchor_container" \
@@ -23,6 +28,7 @@ if [ "$(docker inspect -f '{{.State.Running}}' "$anchor_container" 2>/dev/null)"
 fi
 
 docker run --rm \
+  --label "$session_label" \
   --cap-drop=ALL \
   --security-opt=no-new-privileges \
   --user "$(id -u):$(id -g)" \
@@ -36,3 +42,15 @@ docker run --rm \
   -v "$HOME/.task:/home/claude-docked/.task" \
   -v "$HOME/.kloot/.claude.json:/home/claude-docked/.claude.json" \
   -it kloot:latest claude --allow-dangerously-skip-permissions "$@"
+session_exit=$?
+
+# Removing the anchor kills every process in its PID namespace, so it is only
+# removed once no session container is running anymore. `docker ps` lists running
+# containers only, so a session that has exited but whose --rm removal is still in
+# flight does not keep the anchor alive. A session that starts in the sub-second
+# window between this check and the removal fails with a Docker error or is killed
+# at startup; running kloot again recreates the anchor and recovers.
+if [ -z "$(docker ps -q --filter "label=$session_label")" ]; then
+  docker rm -f "$anchor_container" >/dev/null 2>&1
+fi
+exit "$session_exit"
