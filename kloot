@@ -5,10 +5,29 @@ if [ "$PWD" = "$HOME" ]; then
   exit 1
 fi
 
+# Claude Code sessions discover each other through ~/.claude/sessions/<pid>.json
+# and talk over unix sockets in /tmp/cc-socks/<pid>.sock. A peer only counts as
+# reachable when it lives in the same PID namespace, so every kloot container
+# joins the namespace of one long-lived anchor container and shares one /tmp
+# through a named volume. A named volume is used instead of a bind mount because
+# unix sockets on a macOS bind mount are unreliable under Docker Desktop.
+anchor_container=kloot-pidns
+if [ "$(docker inspect -f '{{.State.Running}}' "$anchor_container" 2>/dev/null)" != "true" ]; then
+  docker rm -f "$anchor_container" >/dev/null 2>&1
+  docker run -d --name "$anchor_container" \
+    --init \
+    --cap-drop=ALL \
+    --security-opt=no-new-privileges \
+    --user "$(id -u):$(id -g)" \
+    kloot:latest sleep infinity >/dev/null
+fi
+
 docker run --rm \
   --cap-drop=ALL \
   --security-opt=no-new-privileges \
   --user "$(id -u):$(id -g)" \
+  --pid "container:$anchor_container" \
+  -v kloot-tmp:/tmp \
   -e HOME=/home/claude-docked \
   -v "$PWD:$PWD" \
   -w "$PWD" \
@@ -16,4 +35,4 @@ docker run --rm \
   -v "$HOME/kloot:/home/claude-docked/kloot" \
   -v "$HOME/.task:/home/claude-docked/.task" \
   -v "$HOME/.kloot/.claude.json:/home/claude-docked/.claude.json" \
-  -it kloot:latest claude --allow-dangerously-skip-permissions --model claude-opus-4-8 "$@"
+  -it kloot:latest claude --allow-dangerously-skip-permissions "$@"
