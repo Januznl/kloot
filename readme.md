@@ -15,6 +15,8 @@ Closing one session while another one starts in the same sub-second can remove t
 
 ## Included packages
 * RTK (https://github.com/rtk-ai/rtk)
+* glab, the GitLab CLI, latest release from https://gitlab.com/gitlab-org/cli/-/releases at build time
+* Go, latest stable release, copied from the official `golang` Docker image at build time
 
 ## Installation
 * Clone the project on your machine
@@ -27,6 +29,9 @@ Run `kloot <Claude options>` in your repo folder
 
 ## Configuration
 Kloot will create its own config folder in your homedir `~/.kloot`, here you can find all Claude config files as usual.
+
+### user credentials configs
+The container users `~/.config` is mounted into your own homedir on the host in folder `~/kloot-config` to save credentials and configs specific for the claude agent inside the container.
 
 ## Updating
 You can update Claude by running `task build` inside the cloned folder. 
