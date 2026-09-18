@@ -12,6 +12,7 @@ tasks:
       - docker build --pull --no-cache -t kloot:latest .
       - docker run -it kloot:latest claude --version
       - docker run -it kloot:latest glab --version
+      - docker run -it kloot:latest sh -c 'gopls version && golangci-lint version && mockery version && shfmt --version && python3 --version && shellcheck --version && make --version'
 
   sh:
     desc: "build container"

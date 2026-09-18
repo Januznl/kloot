@@ -17,6 +17,10 @@ Closing one session while another one starts in the same sub-second can remove t
 * RTK (https://github.com/rtk-ai/rtk)
 * glab, the GitLab CLI, latest release from https://gitlab.com/gitlab-org/cli/-/releases at build time
 * Go, latest stable release, copied from the official `golang` Docker image at build time
+* gopls, mockery and shfmt, latest release built with `go install` in the `golang` build stage
+* golangci-lint, latest release .deb from https://github.com/golangci/golangci-lint/releases at build time
+* Python 3 with pip and venv. The container home directory is not persisted, so `pip install --user` is lost when the session ends; create a virtualenv inside the project directory instead
+* Utilities: unzip, zip, xz, bzip2, make, patch, file, tree, wget, rsync, iproute2, dig, nc, lsof, strace, shellcheck, nano
 
 ## Installation
 * Clone the project on your machine
